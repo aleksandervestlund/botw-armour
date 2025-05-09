@@ -4,6 +4,9 @@ from tkinter import Canvas, Frame, Scrollbar, Tk
 from typing import TypedDict
 
 
+HEIGHT = 0.945
+
+
 @dataclass(slots=True)
 class IndexGenerator:
     _current_idx: int = 0
@@ -27,7 +30,7 @@ def create_scrollable_frame(root: Tk, width: float, pos: int) -> Frame:
     canvas = Canvas(
         root,
         width=root.winfo_screenwidth() * width,
-        height=root.winfo_screenheight(),
+        height=root.winfo_screenheight() * HEIGHT,
     )
     scrollbar = Scrollbar(root, orient="vertical", command=canvas.yview)
     canvas.configure(yscrollcommand=scrollbar.set)

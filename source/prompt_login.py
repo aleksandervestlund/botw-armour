@@ -1,8 +1,6 @@
-import os
 from tkinter import Button, Entry, Label, StringVar, Tk, Toplevel
 
 from source.armour_tracker import ArmourTracker
-from source.constants import DATA_FOLDER
 
 
 def prompt_login(root: Tk) -> None:
@@ -11,11 +9,7 @@ def prompt_login(root: Tk) -> None:
             return
 
         login_window.destroy()
-        save_path = os.path.join(DATA_FOLDER, f"{username}.json")
-        armour_tracker = ArmourTracker(root, username)
-
-        if os.path.exists(save_path):
-            armour_tracker.load_state()
+        ArmourTracker(root, username)
 
     login_window = Toplevel(root)
     login_window.title("Login")

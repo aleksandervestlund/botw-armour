@@ -45,6 +45,9 @@ class ArmourTracker:
         self.build_rows()
         self.update_totals()
 
+        if os.path.exists(self.save_path):
+            self.load_state()
+
         self.root.attributes("-fullscreen", True)
 
     def build_headers(self) -> None:
