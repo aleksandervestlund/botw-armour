@@ -10,6 +10,7 @@ from source.constants import (
     ARMOUR_WIDTH,
     DATA_FOLDER,
     FONT,
+    PADX,
     STAR,
     TOTALS_WIDTH,
 )
@@ -44,6 +45,8 @@ class ArmourTracker:
         self.build_rows()
         self.update_totals()
 
+        self.root.attributes("-fullscreen", True)
+
     def build_headers(self) -> None:
         Label(self.armour_frame, text="Armour Piece", font=FONT).grid(
             row=0, column=0, sticky="w", padx=5, pady=5
@@ -55,13 +58,13 @@ class ArmourTracker:
             )
 
         Label(self.totals_frame, text="Item", font=FONT).grid(
-            row=0, column=0, sticky="w"
+            row=0, column=0, sticky="w", padx=PADX
         )
         Label(self.totals_frame, text="Qty", font=FONT).grid(
-            row=0, column=1, sticky="w"
+            row=0, column=1, sticky="w", padx=PADX
         )
         Label(self.totals_frame, text="✓", font=FONT).grid(
-            row=0, column=2, sticky="w"
+            row=0, column=2, sticky="w", padx=PADX
         )
 
     def build_rows(self) -> None:
@@ -105,7 +108,7 @@ class ArmourTracker:
                 justify="left",
             )
             checkbutton.grid(
-                row=row_index, column=level + 1, sticky="w", padx=5
+                row=row_index, column=level + 1, sticky="w", padx=PADX
             )
             self.checkbox_vars[(armour_name, level)] = var
 
@@ -134,8 +137,8 @@ class ArmourTracker:
             item_label = Label(self.totals_frame, text=item)
             qty_label = Label(self.totals_frame, text=str(qty))
 
-            item_label.grid(row=row_offset, column=0, sticky="w")
-            qty_label.grid(row=row_offset, column=1, sticky="w")
+            item_label.grid(row=row_offset, column=0, sticky="w", padx=PADX)
+            qty_label.grid(row=row_offset, column=1, sticky="w", padx=PADX)
 
             if not (var := self.collected_vars.get(item)):
                 var = IntVar()
@@ -146,7 +149,7 @@ class ArmourTracker:
                 variable=var,
                 command=lambda: (self.update_totals(), self.save_state()),  # type: ignore
             )
-            cb.grid(row=row_offset, column=2, sticky="w")
+            cb.grid(row=row_offset, column=2)
 
             self.total_labels[item] = item_label
             self.total_labels[f"{item}_qty"] = qty_label

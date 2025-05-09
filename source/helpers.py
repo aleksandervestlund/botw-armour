@@ -4,9 +4,6 @@ from tkinter import Canvas, Frame, Scrollbar, Tk
 from typing import TypedDict
 
 
-HEIGHT = 800
-
-
 @dataclass(slots=True)
 class IndexGenerator:
     _current_idx: int = 0
@@ -26,8 +23,12 @@ def format_ingredients(ingredients: Iterable[tuple[str, int]]) -> str:
     return "\n".join(f"{qty} {item}" for item, qty in ingredients)
 
 
-def create_scrollable_frame(root: Tk, width: int, pos: int) -> Frame:
-    canvas = Canvas(root, width=width, height=HEIGHT)
+def create_scrollable_frame(root: Tk, width: float, pos: int) -> Frame:
+    canvas = Canvas(
+        root,
+        width=root.winfo_screenwidth() * width,
+        height=root.winfo_screenheight(),
+    )
     scrollbar = Scrollbar(root, orient="vertical", command=canvas.yview)
     canvas.configure(yscrollcommand=scrollbar.set)
     frame = Frame(canvas)
