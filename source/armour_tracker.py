@@ -14,13 +14,16 @@ from source.constants import (
     STAR,
     TOTALS_WIDTH,
 )
+from source.game import Game
 from source.helpers import create_scrollable_frame, format_ingredients
+from source.totk_armour_data import TOTK_ARMOUR_DATA
 
 
 @dataclass(slots=True)
 class ArmourTracker:
     root: Tk
     username: str
+    game: Game = field(init=False, default=Game.BOTW)
     checkbox_vars: dict[tuple[str, int], IntVar] = field(
         init=False, default_factory=dict
     )
@@ -33,10 +36,15 @@ class ArmourTracker:
 
     @property
     def save_path(self) -> str:
-        return os.path.join(DATA_FOLDER, f"{self.username}.json")
+        return os.path.join(
+            f"{DATA_FOLDER}_{self.game}", f"{self.username}.json"
+        )
 
     def __post_init__(self) -> None:
-        self.root.title("Zelda BOTW Armour Tracker")
+        if not self.username.isidentifier():
+            raise ValueError(f"Invalid username: {self.username}.")
+
+        self.root.title(f"Zelda {self.game.upper()} Armour Tracker")
 
         self.armour_frame = create_scrollable_frame(self.root, ARMOUR_WIDTH, 0)
         self.totals_frame = create_scrollable_frame(self.root, TOTALS_WIDTH, 2)
@@ -71,8 +79,11 @@ class ArmourTracker:
         )
 
     def build_rows(self) -> None:
+        armour_data = (
+            BOTW_ARMOUR_DATA if self.game is Game.BOTW else TOTK_ARMOUR_DATA
+        )
         sorted_armour = sorted(
-            BOTW_ARMOUR_DATA.items(), key=lambda x: x[1]["index"]
+            armour_data.items(), key=lambda x: x[1]["index"]
         )
 
         for row_index, (armour_name, armour_info) in enumerate(
@@ -117,8 +128,11 @@ class ArmourTracker:
 
     def update_totals(self) -> None:
         totals: defaultdict[str, int] = defaultdict(int)
+        armour_data = (
+            BOTW_ARMOUR_DATA if self.game is Game.BOTW else TOTK_ARMOUR_DATA
+        )
 
-        for armour_name, armour_info in BOTW_ARMOUR_DATA.items():
+        for armour_name, armour_info in armour_data.items():
             upgrades = armour_info["upgrades"]
 
             for level, ingredients in enumerate(upgrades):
