@@ -3,7 +3,16 @@ import os
 from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
-from tkinter import Checkbutton, Frame, IntVar, Label, Tk, messagebox
+from tkinter import (
+    Button,
+    Checkbutton,
+    Frame,
+    IntVar,
+    Label,
+    StringVar,
+    Tk,
+    messagebox,
+)
 
 from source.botw_armour_data import BOTW_ARMOUR_DATA
 from source.constants import (
@@ -12,6 +21,7 @@ from source.constants import (
     FONT,
     PADX,
     STAR,
+    STORING_SEPARATOR,
     TOTALS_WIDTH,
 )
 from source.game import Game
@@ -31,8 +41,10 @@ class ArmourTracker:
     total_labels: dict[str, Checkbutton | Label] = field(
         init=False, default_factory=dict
     )
+    toggle_button: Button = field(init=False)
     armour_frame: Frame = field(init=False)
     totals_frame: Frame = field(init=False)
+    game_var: StringVar = field(init=False)
 
     @property
     def save_path(self) -> str:
@@ -46,6 +58,39 @@ class ArmourTracker:
 
         self.root.title(f"Zelda {self.game.upper()} Armour Tracker")
 
+        self.game_var = StringVar(value=self.game.value)
+        self.toggle_button = Button(
+            self.root,
+            text=(
+                "Switch to "
+                f"{Game.TOTK.upper() if self.game is Game.BOTW else Game.BOTW.upper()}"
+            ),
+            command=self.toggle_game,
+            font=FONT,
+        )
+        self.toggle_button.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+
+        self.load()
+
+        self.root.attributes("-fullscreen", True)
+
+    def toggle_game(self) -> None:
+        # Switch game
+        self.game = Game.TOTK if self.game is Game.BOTW else Game.BOTW
+        self.game_var.set(self.game.value)
+        self.toggle_button.config(
+            text=f"Switch to {'TOTK' if self.game is Game.BOTW else 'BOTW'}"
+        )
+        # Destroy old frames and rebuild
+        self.armour_frame.destroy()
+        self.totals_frame.destroy()
+        self.checkbox_vars.clear()
+        self.collected_vars.clear()
+        self.total_labels.clear()
+
+        self.load()
+
+    def load(self) -> None:
         self.armour_frame = create_scrollable_frame(self.root, ARMOUR_WIDTH, 0)
         self.totals_frame = create_scrollable_frame(self.root, TOTALS_WIDTH, 2)
 
@@ -55,8 +100,6 @@ class ArmourTracker:
 
         if os.path.exists(self.save_path):
             self.load_state()
-
-        self.root.attributes("-fullscreen", True)
 
     def build_headers(self) -> None:
         Label(self.armour_frame, text="Armour Piece", font=FONT).grid(
@@ -193,7 +236,7 @@ class ArmourTracker:
     def save_state(self) -> None:
         state = {
             "checkboxes": {
-                f"{armour}::{level}": value.get()
+                f"{armour}{STORING_SEPARATOR}{level}": value.get()
                 for (armour, level), value in self.checkbox_vars.items()
             },
             "collected": {
@@ -212,7 +255,7 @@ class ArmourTracker:
             return
 
         for key, value in state.get("checkboxes", {}).items():
-            name, level = key.split("::")
+            name, level = key.split(STORING_SEPARATOR)
             self.checkbox_vars[(name, int(level))].set(value)
 
         for item, value in state.get("collected", {}).items():

@@ -40,6 +40,6 @@ def create_scrollable_frame(root: Tk, width: float, pos: int) -> Frame:
         lambda _: canvas.configure(scrollregion=canvas.bbox("all")),
     )
     canvas.create_window((0, 0), window=frame, anchor="nw")
-    canvas.grid(row=0, column=pos, sticky="nw", padx=10, pady=5)
-    scrollbar.grid(row=0, column=pos + 1, sticky="ns")
+    canvas.grid(row=1, column=pos, sticky="nw", padx=10, pady=5)
+    scrollbar.grid(row=1, column=pos + 1, sticky="ns")
     return frame
