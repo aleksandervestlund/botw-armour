@@ -5,8 +5,8 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from tkinter import Checkbutton, Frame, IntVar, Label, Tk, messagebox
 
+from source.botw_armour_data import BOTW_ARMOUR_DATA
 from source.constants import (
-    ARMOUR_DATA,
     ARMOUR_WIDTH,
     DATA_FOLDER,
     FONT,
@@ -72,7 +72,7 @@ class ArmourTracker:
 
     def build_rows(self) -> None:
         sorted_armour = sorted(
-            ARMOUR_DATA.items(), key=lambda x: x[1]["index"]
+            BOTW_ARMOUR_DATA.items(), key=lambda x: x[1]["index"]
         )
 
         for row_index, (armour_name, armour_info) in enumerate(
@@ -118,7 +118,7 @@ class ArmourTracker:
     def update_totals(self) -> None:
         totals: defaultdict[str, int] = defaultdict(int)
 
-        for armour_name, armour_info in ARMOUR_DATA.items():
+        for armour_name, armour_info in BOTW_ARMOUR_DATA.items():
             upgrades = armour_info["upgrades"]
 
             for level, ingredients in enumerate(upgrades):
